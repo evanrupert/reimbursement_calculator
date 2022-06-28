@@ -7,6 +7,9 @@
     "start": "node index.js",
     "test": "node_modules/.bin/jasmine test.js"
   },
+  "dependencies": {
+    "luxon": "^2.4.0"
+  },
   "devDependencies": {
     "jasmine": "^4.2.1",
     "eslint": "^8.18.0",
