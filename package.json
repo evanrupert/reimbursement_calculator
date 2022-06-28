@@ -1,0 +1,25 @@
+{
+  "name": "reimbursement_calculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node_modules/.bin/jasmine test.js"
+  },
+  "devDependencies": {
+    "jasmine": "^4.2.1",
+    "eslint": "^8.18.0",
+    "eslint-config-airbnb": "^19.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evanrupert/reimbursement_calculator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/evanrupert/reimbursement_calculator/issues"
+  },
+  "homepage": "https://github.com/evanrupert/reimbursement_calculator#readme"
+}
