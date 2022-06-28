@@ -20,12 +20,22 @@ function isFullDay(activeDates, date) {
 function convertProjectListToDateMap(set) {
   const activeDates = new Map();
 
+  // Loop over each project and flatten all active dates (dates between start and end)
+  //    of all projects into a single map to handle any overlapping
   set.forEach((project) => {
     let date = project.startDate;
     while (date <= project.endDate) {
-      // TODO: If same date was previously entered with a low cost,
-      //        change to high cost since it takes precedent
-      activeDates.set(date.toSeconds(), project.cityCost);
+      const dateInSeconds = date.toSeconds();
+
+      // If this date has a previous entry and this project is a high cost project,
+      //    replace the previous entry's cost with high
+      if (activeDates.has(dateInSeconds)) {
+        if (project.cityCost === 'High') {
+          activeDates.set(dateInSeconds, 'High');
+        }
+      } else {
+        activeDates.set(dateInSeconds, project.cityCost);
+      }
 
       date = date.plus({ days: 1 });
     }
@@ -48,7 +58,7 @@ exports.calculateReimbursement = (set) => {
 
     const fullDay = isFullDay(activeDates, date);
 
-    console.log(`${date.toString()}: ${fullDay}`);
+    console.log(`${date.toString()}: ${fullDay ? 'Full' : 'Travel'}, ${cost}`);
 
     totalCost += fullDay ? FULL_DAY_COST[cost] : TRAVEL_DAY_COST[cost];
   });

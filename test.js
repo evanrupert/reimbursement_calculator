@@ -1,9 +1,9 @@
 const { DateTime } = require('luxon');
-const lib = require('./index');
+const { calculateReimbursement } = require('./index');
 
 describe('Reimbursement Calculator', () => {
   it('should calculate reimbursement for a single project', () => {
-    const result = lib.calculateReimbursement([{
+    const result = calculateReimbursement([{
       startDate: DateTime.local(2015, 9, 1),
       endDate: DateTime.local(2015, 9, 3),
       cityCost: 'Low',
@@ -13,7 +13,7 @@ describe('Reimbursement Calculator', () => {
   });
 
   it('should calculate reimbursement for multiple projects', () => {
-    const result = lib.calculateReimbursement([
+    const result = calculateReimbursement([
       {
         startDate: DateTime.local(2015, 9, 1),
         endDate: DateTime.local(2015, 9, 3),
@@ -32,5 +32,27 @@ describe('Reimbursement Calculator', () => {
     ]);
 
     expect(result).toBe(445);
+  });
+
+  it('should calculate correctly with overlapping projects that have different costs', () => {
+    const result = calculateReimbursement([
+      {
+        startDate: DateTime.local(2015, 9, 1),
+        endDate: DateTime.local(2015, 9, 1),
+        cityCost: 'Low',
+      },
+      {
+        startDate: DateTime.local(2015, 9, 2),
+        endDate: DateTime.local(2015, 9, 6),
+        cityCost: 'High',
+      },
+      {
+        startDate: DateTime.local(2015, 9, 6),
+        endDate: DateTime.local(2015, 9, 8),
+        cityCost: 'Low',
+      },
+    ]);
+
+    expect(result).toBe(590);
   });
 });
