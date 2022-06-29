@@ -1,5 +1,5 @@
 const { DateTime } = require('luxon');
-const { calculateReimbursement } = require('./index');
+const { calculateReimbursement } = require('./calculator');
 
 describe('Reimbursement Calculator', () => {
   // Example Set 1

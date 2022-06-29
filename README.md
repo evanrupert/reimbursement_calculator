@@ -7,7 +7,7 @@ Reimbursement Calculator
 
 ### Testing arbitrary sets
 To test the function with a set of your choice do the following:
-1. Navigate to the bottom of the `index.js` file starting at line 86
+1. Navigate to the `index.js` file
 2. Modify the `set` variable to contain your preferred project data using the following fields: `cityCost`, `startDate`
 and `endDate`.
 3. Run the command `npm start`, the total reimbursement cost of your set will then be displayed in the console.
