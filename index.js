@@ -10,18 +10,34 @@ const TRAVEL_DAY_COST = {
   High: 55,
 };
 
-function isFullDay(activeDates, date) {
+const CITY_COST = {
+  HIGH: 'High',
+  LOW: 'Low',
+};
+
+function validateProject(project) {
+  if (!Object.values(CITY_COST).includes(project.cityCost)) {
+    throw new Error('Invalid city cost');
+  }
+
+  if (project.startDate > project.endDate) {
+    throw new Error('endDate cannot come before startDate');
+  }
+}
+
+function isFullDay(workingDates, date) {
+  // Check if previous and following days exist in map, if so, it is a full day
   const previousDayInSeconds = date.minus({ days: 1 }).toSeconds();
   const nextDayInSeconds = date.plus({ days: 1 }).toSeconds();
 
-  return activeDates.has(previousDayInSeconds) && activeDates.has(nextDayInSeconds);
+  return workingDates.has(previousDayInSeconds) && workingDates.has(nextDayInSeconds);
 }
 
 function convertProjectListToDateMap(set) {
-  const activeDates = new Map();
+  const workingDates = new Map();
 
-  // Loop over each project and flatten all active dates (dates between start and end)
-  //    of all projects into a single map to handle any overlapping
+  // Loop over each project and flatten all working dates (dates between start and end)
+  //    of all projects into a single map to handle any overlapping projects
   set.forEach((project) => {
     let date = project.startDate;
     while (date <= project.endDate) {
@@ -29,19 +45,19 @@ function convertProjectListToDateMap(set) {
 
       // If this date has a previous entry and this project is a high cost project,
       //    replace the previous entry's cost with high
-      if (activeDates.has(dateInSeconds)) {
-        if (project.cityCost === 'High') {
-          activeDates.set(dateInSeconds, 'High');
+      if (workingDates.has(dateInSeconds)) {
+        if (project.cityCost === CITY_COST.HIGH) {
+          workingDates.set(dateInSeconds, CITY_COST.HIGH);
         }
       } else {
-        activeDates.set(dateInSeconds, project.cityCost);
+        workingDates.set(dateInSeconds, project.cityCost);
       }
 
       date = date.plus({ days: 1 });
     }
   });
 
-  return activeDates;
+  return workingDates;
 }
 
 exports.calculateReimbursement = (set) => {
@@ -49,19 +65,41 @@ exports.calculateReimbursement = (set) => {
     return 0;
   }
 
-  const activeDates = convertProjectListToDateMap(set);
+  set.forEach(validateProject);
+
+  const workingDates = convertProjectListToDateMap(set);
 
   let totalCost = 0;
 
-  activeDates.forEach((cost, dateInSeconds) => {
+  workingDates.forEach((cityCost, dateInSeconds) => {
     const date = DateTime.fromSeconds(dateInSeconds);
 
-    const fullDay = isFullDay(activeDates, date);
-
-    console.log(`${date.toString()}: ${fullDay ? 'Full' : 'Travel'}, ${cost}`);
-
-    totalCost += fullDay ? FULL_DAY_COST[cost] : TRAVEL_DAY_COST[cost];
+    totalCost += isFullDay(workingDates, date)
+      ? FULL_DAY_COST[cityCost]
+      : TRAVEL_DAY_COST[cityCost];
   });
 
   return totalCost;
 };
+
+// Modify this to test any arbitrary set of projects
+const set = [
+  {
+    startDate: DateTime.local(2015, 9, 1),
+    endDate: DateTime.local(2015, 9, 1),
+    cityCost: 'Low',
+  },
+  {
+    startDate: DateTime.local(2015, 9, 2),
+    endDate: DateTime.local(2015, 9, 6),
+    cityCost: 'High',
+  },
+  {
+    startDate: DateTime.local(2015, 9, 6),
+    endDate: DateTime.local(2015, 9, 8),
+    cityCost: 'Low',
+  },
+];
+
+const result = exports.calculateReimbursement(set);
+console.log(`Result: ${result}`);
